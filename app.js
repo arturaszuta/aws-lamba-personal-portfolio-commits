@@ -1,13 +1,20 @@
 const AXIOS = require('axios');
+
+ let token = require("./token.js");
   
   let repoData = [];
   let finalRepoData = [];
-  let syncComplete = { status: false };
+
+  function logData(data) {
+    console.log(data);
+  }
   
   AXIOS.get('https://api.github.com/users/arturaszuta/repos', {
     headers: {
+      'Authorization': `Bearer ${token.value}`,
       auth: {
-        'username': 'arturaszuta'
+        'username': 'arturaszuta',
+        'token': process.env.token
       }
     }
   }).then(function(response) {
@@ -28,8 +35,10 @@ const AXIOS = require('axios');
       
       AXIOS.get(url, {
         headers: {
+          'Authorization': `Bearer ${token.value}`,
           auth: {
-            'username': 'arturaszuta'
+            'username': 'arturaszuta',
+            'token': process.env.token
           }
         }
       }).then(function(response) {
@@ -38,15 +47,14 @@ const AXIOS = require('axios');
         
         if (el.commitsLM !== 0 || el.commitsLW !== 0) {
           finalRepoData.push(el);
-          console.log(finalRepoData)
         }
         
+        if(index === repoData.length -1) {
+          console.log('index is a match');
+          syncComplete = true;
+          logData(finalRepoData);
+        } 
       });
-      
-      // if(index === repoData.length - 1) {
-      //   console.log(finalRepoData);
-      // }
-      
     })
   })
   
