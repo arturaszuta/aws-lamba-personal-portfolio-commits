@@ -1,21 +1,15 @@
 const AXIOS = require('axios');
 
- let token = require("./token.js");
+exports.handler = async (event, context, callback) => {
+
+function getCommitData() {
   
   let repoData = [];
   let finalRepoData = [];
 
-  function logData(data) {
-    console.log(data);
-  }
-  
   AXIOS.get('https://api.github.com/users/arturaszuta/repos', {
     headers: {
-      'Authorization': `Bearer ${token.value}`,
-      auth: {
-        'username': 'arturaszuta',
-        'token': process.env.token
-      }
+      'Authorization': `Bearer ${token.value}`
     }
   }).then(function(response) {
     response.data.forEach(element => {
@@ -27,7 +21,9 @@ const AXIOS = require('axios');
         commitsLM: 0
       }
       repoData.push(obj)
+      return repoData;
     });
+    
     
     
     repoData.forEach((el, index) => {
@@ -35,11 +31,7 @@ const AXIOS = require('axios');
       
       AXIOS.get(url, {
         headers: {
-          'Authorization': `Bearer ${token.value}`,
-          auth: {
-            'username': 'arturaszuta',
-            'token': process.env.token
-          }
+          'Authorization': `Bearer ${token.value}`
         }
       }).then(function(response) {
         el.commitsLW = response.data[51].total;
@@ -50,15 +42,23 @@ const AXIOS = require('axios');
         }
         
         if(index === repoData.length -1) {
-          console.log('index is a match');
-          syncComplete = true;
-          logData(finalRepoData);
+
+          if(finalRepoData.length < 5) {
+            getCommitData();
+          }
+
+          callback(null, finalRepoData);
         } 
       });
     })
   })
   
+}
 
+getCommitData();
+
+}
+  
   
   
   
